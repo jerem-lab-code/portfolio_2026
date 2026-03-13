@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Ecosystem Snippet</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+            touch-action: none;
+            background: #FCF3EA;
+            color: #000;
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            touch-action: none;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .ui-overlay>* {
+            pointer-events: auto;
+        }
+
+        .layout-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .tags-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #tag-list {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 999px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            max-width: 100%;
+            pointer-events: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        #tag-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: 1.5px solid #000;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 999px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            color: #000;
+        }
+
+        button.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .tag-item {
+            padding: 8px 14px;
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            font-size: 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            white-space: nowrap;
+            width: fit-content;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .tag-item:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .tag-item.active {
+            background: #000;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+    <div class="ui-overlay">
+        <div class="layout-controls">
+            <button id="btn-random" class="active">Random</button>
+            <button id="btn-grouped">Grouped</button>
+            <button id="btn-grid">Grid</button>
+        </div>
+        <div class="tags-container">
+            <div id="tag-list"></div>
+        </div>
+    </div>
+
+    <!-- TFJS and Pose Detection removed for optimization as startBodyTracking is not used -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs" defer></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection" defer></script> -->
+
+    <script type="module">
+        import Ecosystem from './code_snippet_ecosystem.js';
+
+        const app = document.querySelector('#app');
+        // Use baseUrl = '' because image_list.json paths start with /project_utiliser
+        const ecosystem = new Ecosystem(app, '');
+        ecosystem.init();
+
+        const buttons = {
+            random: document.getElementById('btn-random'),
+            grouped: document.getElementById('btn-grouped'),
+            grid: document.getElementById('btn-grid')
+        };
+
+        const setActiveButton = (activeId) => {
+            Object.values(buttons).forEach(btn => {
+                btn.classList.toggle('active', btn.id === activeId);
+            });
+        };
+
+        buttons.random.onclick = () => { setActiveButton('btn-random'); ecosystem.randomizeLayout(); };
+        buttons.grouped.onclick = () => { setActiveButton('btn-grouped'); ecosystem.applyTagLayout(); };
+        buttons.grid.onclick = () => { setActiveButton('btn-grid'); ecosystem.gridLayout(); };
+
+        const tagListContainer = document.getElementById('tag-list');
+
+        window.addEventListener('tags-loaded', (e) => {
+            const tags = e.detail.tags;
+            tagListContainer.innerHTML = '';
+            tags.sort();
+
+            // Add 'All' option first
+            const allItem = document.createElement('div');
+            allItem.className = 'tag-item active';
+            allItem.innerText = 'ALL';
+            allItem.onclick = () => {
+                document.querySelectorAll('.tag-item').forEach(el => el.classList.remove('active'));
+                allItem.classList.add('active');
+                ecosystem.filterByTag('all');
+            };
+            tagListContainer.appendChild(allItem);
+
+            // Keep only top-level categories and selected sub-project tags.
+            const mainCategories = ['visual-identity', '3d', 'creative-coding', 'photo', 'poster'];
+            const subProjectEnabled = ['visual-identity', '3d', 'creative-coding'];
+
+            const displayTags = tags.filter(tag => {
+                if (mainCategories.includes(tag)) return true;
+                const sampleImg = Object.keys(ecosystem.tagsData).find(img => ecosystem.tagsData[img][0] === tag);
+                if (sampleImg) {
+                    const category = ecosystem.tagsData[sampleImg][1];
+                    return subProjectEnabled.includes(category);
+                }
+                return false;
+            });
+
+            displayTags.sort((a, b) => {
+                const aIsMain = mainCategories.includes(a);
+                const bIsMain = mainCategories.includes(b);
+                if (aIsMain && !bIsMain) return -1;
+                if (!aIsMain && bIsMain) return 1;
+                return a.localeCompare(b);
+            });
+
+            displayTags.forEach(tag => {
+                const item = document.createElement('div');
+                item.className = 'tag-item';
+                item.innerText = mainCategories.includes(tag) ? tag.toUpperCase() : tag;
+
+                item.onclick = () => {
+                    document.querySelectorAll('.tag-item').forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                    ecosystem.filterByTag(tag);
+                };
+                tagListContainer.appendChild(item);
+            });
+        });
+    </script>
+</body>
+
+</html>

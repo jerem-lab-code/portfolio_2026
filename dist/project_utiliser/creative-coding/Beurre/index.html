@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Beurre Snippet</title>
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+
+    <!-- Sketch Classes -->
+    <script src="Knife.js"></script>
+    <script src="Rect.js"></script>
+    <script src="Peel.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            touch-action: none;
+            background: #FFD8B8;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #sound-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* Loading Screen */
+        #p5_loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FFD8B8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="p5_loading">Loading...</div>
+    <button id="sound-toggle" title="Toggle Sound"></button>
+
+    <!-- Main Sketch -->
+    <script src="code_snippet_sketch.js"></script>
+</body>
+
+</html>
