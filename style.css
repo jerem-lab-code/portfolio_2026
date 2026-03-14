@@ -188,13 +188,14 @@ body.is-info-opening .info-view::before {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: clamp(10px, 1.8vh, 16px);
+  gap: clamp(8px, 1.4vh, 12px);
   text-align: left;
   max-width: min(88ch, 94vw);
   opacity: 0;
   transform: translateY(18px) scale(0.98);
   transition: opacity 360ms ease 120ms,
   transform 560ms cubic-bezier(0.16, 1, 0.3, 1) 120ms;
+  max-height: min(82vh, 640px);
 }
 
 body.is-info-open .info-view-content {
@@ -214,7 +215,6 @@ body.is-info-open .info-view-content {
 
 .info-view-text {
   margin: 0;
-  max-width: min(62ch, 84vw);
   font-family: var(--suisse-font);
   font-size: clamp(0.92rem, 1.6vw, 1.08rem);
   font-weight: 400;
@@ -226,12 +226,101 @@ body.is-info-open .info-view-content {
   text-justify: inter-word;
 }
 
+.info-view-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: clamp(8px, 1.6vh, 14px);
+}
+
+.info-view-tab.category-button {
+  width: auto;
+  min-width: 0;
+  min-height: var(--pill-height);
+  padding: 0 clamp(0.85rem, 2.2vw, 1.3rem);
+  font-size: var(--pill-size);
+  opacity: 1;
+  transform: none;
+}
+
+.info-view-panels {
+  position: relative;
+  overflow: hidden;
+}
+
+.info-view-panel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding-right: 10px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 320ms ease;
+}
+
+.info-view-panels[data-active="info"] .info-view-panel[data-panel="info"] {
+  position: relative;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.info-view-panels[data-active="skills"] .info-view-panel[data-panel="skills"] {
+  position: relative;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.info-view-panel[data-panel="skills"] {
+  overflow-y: auto;
+}
+
+.info-view-panel[data-panel="info"] {
+  overflow: visible;
+}
+
+.info-view-panels[data-active="skills"] .info-view-panel[data-panel="info"] {
+  transform: translateX(-100%);
+}
+
+.info-view-panels[data-active="info"] .info-view-panel[data-panel="skills"] {
+  transform: translateX(100%);
+}
+
+.info-view-skills-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(10px, 2vw, 16px);
+  padding: 2px 0 6px;
+}
+
+.info-view-skill-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.38rem clamp(0.9rem, 2.6vw, 1.25rem);
+  font-family: var(--suisse-font);
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--project-name-pill-text);
+  background: var(--project-name-pill-bg);
+  border: 1.5px solid color-mix(in oklab, var(--heading-text) 55%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
 .info-view-links {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-start;
   margin-top: clamp(6px, 1.2vh, 10px);
+  --pill-padding-x: clamp(0.82rem, 2.1vw, 1.2rem);
 }
 
 .info-view-link,
@@ -241,7 +330,6 @@ body.is-info-open .info-view-content {
   justify-content: center;
   text-decoration: none;
   min-height: var(--pill-height);
-  padding-inline: clamp(0.9rem, 2.3vw, 1.35rem);
 }
 
 .info-view .pill-button {
@@ -943,6 +1031,10 @@ body.is-categories .category-button:nth-child(5) {
     text-justify: auto;
   }
 
+  .info-view-panels {
+    overflow: hidden;
+  }
+
   .name {
     position: relative;
     gap: 8px;
@@ -976,6 +1068,10 @@ body.is-categories .category-button:nth-child(5) {
   .pill-button {
     padding: 0.3rem clamp(0.7rem, 4vw, 1.2rem);
     min-height: 2.2rem;
+  }
+
+  .info-view-links .pill-button {
+    padding: 0.3rem var(--pill-padding-x);
   }
 
   body {

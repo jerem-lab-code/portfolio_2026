@@ -83,7 +83,79 @@ function createInfoView() {
   const text = document.createElement("p");
   text.className = "info-view-text";
   text.textContent =
-    "Jérémie Kursner is a Swiss interactive media designer based in Amsterdam (NL), graduate of ECAL / University of Art and Design Lausanne (CH).\n\nHe bridges design and technology through 2D/3D animation, creative coding, visual identity, and prototyping. By developing custom tools, motion, design identity and interactive installations he transforms ideas into engaging, tangible experiences. His approach combines narrative thinking with hands-on experimentation, moving seamlessly from concept to execution.\n\nHis work has been presented at Expo 2025 Osaka (JP), Milan Design Week (IT), and Le Cube Garges (FR).";
+    "Jérémie Kursner is a Swiss media interactive designer based in Amsterdam (NL), graduate of ECAL / University of Art and Design Lausanne (CH).\n\nHe bridges design and technology through 2D/3D animation, creative coding, visual identity, and prototyping. By developing custom tools, motion, design identity and interactive installations he transforms ideas into engaging, tangible experiences. His approach combines narrative thinking with hands-on experimentation, moving seamlessly from concept to execution.\n\nHis work has been presented at Expo 2025 Osaka (JP), Milan Design Week (IT), and Le Cube Garges (FR).";
+
+  const tabs = document.createElement("div");
+  tabs.className = "info-view-tabs";
+
+  const infoTabButton = document.createElement("button");
+  infoTabButton.type = "button";
+  infoTabButton.className = "category-button info-view-tab is-active";
+  infoTabButton.textContent = "Info";
+  infoTabButton.setAttribute("aria-pressed", "true");
+
+  const skillsTabButton = document.createElement("button");
+  skillsTabButton.type = "button";
+  skillsTabButton.className = "category-button info-view-tab";
+  skillsTabButton.textContent = "Skill";
+  skillsTabButton.setAttribute("aria-pressed", "false");
+
+  tabs.append(infoTabButton, skillsTabButton);
+
+  const panels = document.createElement("div");
+  panels.className = "info-view-panels";
+  panels.dataset.active = "info";
+
+  const infoPanel = document.createElement("div");
+  infoPanel.className = "info-view-panel";
+  infoPanel.dataset.panel = "info";
+  infoPanel.append(text);
+
+  const skillsPanel = document.createElement("div");
+  skillsPanel.className = "info-view-panel";
+  skillsPanel.dataset.panel = "skills";
+
+  const skillsPills = document.createElement("div");
+  skillsPills.className = "info-view-skills-pills";
+
+  const skills = [
+    "Figma",
+    "Photoshop",
+    "Illustrator",
+    "InDesign",
+    "After Effects",
+    "Blender",
+    "Javascript",
+    "HTML/CSS",
+    "Figma Make",
+    "Antigravity",
+    "Codex",
+    "Nanao Banana",
+    "Midjourney",
+  ];
+
+  skills.forEach((item) => {
+    const pill = document.createElement("span");
+    pill.className = "info-view-skill-pill";
+    pill.textContent = item;
+    skillsPills.append(pill);
+  });
+
+  skillsPanel.append(skillsPills);
+  panels.append(infoPanel, skillsPanel);
+
+  const setActiveTab = (tab) => {
+    const isInfo = tab === "info";
+    panels.dataset.active = isInfo ? "info" : "skills";
+    infoTabButton.classList.toggle("is-active", isInfo);
+    skillsTabButton.classList.toggle("is-active", !isInfo);
+    infoTabButton.setAttribute("aria-pressed", String(isInfo));
+    skillsTabButton.setAttribute("aria-pressed", String(!isInfo));
+    syncPanelsHeight();
+  };
+
+  infoTabButton.addEventListener("click", () => setActiveTab("info"));
+  skillsTabButton.addEventListener("click", () => setActiveTab("skills"));
 
   const links = document.createElement("div");
   links.className = "info-view-links";
@@ -112,7 +184,24 @@ function createInfoView() {
     event.stopPropagation();
   });
 
-  content.append(name, text, links);
+  const syncPanelsHeight = () => {
+    const target = infoPanel.scrollHeight;
+    if (target > 0) {
+      panels.style.height = `${Math.round(target)}px`;
+      panels.style.maxHeight = `${Math.round(target)}px`;
+    }
+  };
+
+  const handleResize = () => {
+    if (infoView.getAttribute("aria-hidden") === "false") {
+      syncPanelsHeight();
+    }
+  };
+
+  window.addEventListener("resize", handleResize);
+  requestAnimationFrame(syncPanelsHeight);
+
+  content.append(name, tabs, panels, links);
   view.append(content);
   view.addEventListener("click", () => closeInfo());
   document.body.append(view);
