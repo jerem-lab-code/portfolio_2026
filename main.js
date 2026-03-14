@@ -97,7 +97,7 @@ function createInfoView() {
   const skillsTabButton = document.createElement("button");
   skillsTabButton.type = "button";
   skillsTabButton.className = "category-button info-view-tab";
-  skillsTabButton.textContent = "Skill";
+  skillsTabButton.textContent = "Skills";
   skillsTabButton.setAttribute("aria-pressed", "false");
 
   tabs.append(infoTabButton, skillsTabButton);
