@@ -162,7 +162,7 @@ function createInfoView() {
 
   const mailLink = document.createElement("a");
   mailLink.className = "pill-button info-view-link";
-  mailLink.href = "mailto:jeremiekursner@gmail.com";
+  mailLink.href = "mailto:hello@jeremiekursner.ch";
   mailLink.textContent = "e-mail";
   mailLink.addEventListener("click", (event) => {
     event.stopPropagation();
