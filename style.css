@@ -1322,3 +1322,35 @@ body.is-categories .category-button:nth-child(5) {
     opacity: 0;
   }
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.seo-noscript {
+  position: fixed;
+  left: var(--page-gutter);
+  right: var(--page-gutter);
+  bottom: var(--page-gutter);
+  font-family: var(--suisse-font);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 60ch;
+  color: var(--heading-text);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border: 1px solid color-mix(in oklab, var(--heading-text) 28%, transparent);
+  border-radius: 18px;
+  padding: 1rem 1.2rem;
+}
+
+.seo-noscript a {
+  color: inherit;
+}
