@@ -638,6 +638,7 @@ img.iland-logo {
 }
 
 .project-other-card {
+  display: block;
   position: relative;
   border: none;
   border-radius: 0;
@@ -647,6 +648,8 @@ img.iland-logo {
   margin: 0;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
+  color: inherit;
 }
 
 .project-other-card img {

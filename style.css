@@ -295,23 +295,14 @@ body.is-info-open .info-view-content {
   flex-wrap: wrap;
   gap: clamp(10px, 2vw, 16px);
   padding: 2px 0 6px;
+  --pill-padding-x: clamp(0.82rem, 2.1vw, 1.2rem);
 }
 
 .info-view-skill-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  padding: 0.38rem clamp(0.9rem, 2.6vw, 1.25rem);
-  font-family: var(--suisse-font);
-  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  color: var(--project-name-pill-text);
-  background: var(--project-name-pill-bg);
-  border: 1.5px solid color-mix(in oklab, var(--heading-text) 55%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  cursor: default;
 }
 
 .info-view-links {
@@ -512,6 +503,14 @@ body.is-categories .actions .pill-button:last-child {
   cursor: pointer;
   transition: min-height 280ms ease, padding 280ms ease, width 280ms ease,
     transform 280ms ease, opacity 280ms ease;
+}
+
+.info-view .info-view-skill-pill.pill-button {
+  cursor: default;
+}
+
+.info-view .info-view-skill-pill.pill-button::before {
+  opacity: 1;
 }
 
 .actions .pill-button {
@@ -903,6 +902,21 @@ body.is-categories .category-button:nth-child(5) {
   border: none;
   overflow: hidden;
   background: transparent;
+}
+
+.project-card-link {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.project-card-link:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--heading-text) 70%, transparent);
+  outline-offset: 2px;
 }
 
 .project-card img {

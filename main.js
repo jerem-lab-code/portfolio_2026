@@ -1,13 +1,25 @@
 import "./style.css";
 import "./project-pages.css";
-import { initCategories } from "./categories.js";
+import { initCategories, openProjectById } from "./categories.js";
 import { initProjectPages } from "./projectPages.js";
+import { getProjectIdFromUrl, updateProjectUrl } from "./projectRouting.js";
 import { initScrollLock } from "./scrollLock.js";
 import { initImageTrail } from "./imageTrail.js";
 
 initScrollLock({ allowSelector: ".gallery-panel" });
 const galleryPanel = document.getElementById("gallery-panel");
-const projectPages = initProjectPages({ galleryPanel });
+let suppressUrlSync = false;
+const projectPages = initProjectPages({
+  galleryPanel,
+  onProjectOpen: (projectPayload) => {
+    if (suppressUrlSync) return;
+    updateProjectUrl(projectPayload.id);
+  },
+  onProjectClose: () => {
+    if (suppressUrlSync) return;
+    updateProjectUrl(null);
+  },
+});
 const infoButton = document.getElementById("info-button");
 const pageBody = document.body;
 let lastScrollPosition = 0;
@@ -136,7 +148,7 @@ function createInfoView() {
 
   skills.forEach((item) => {
     const pill = document.createElement("span");
-    pill.className = "info-view-skill-pill";
+    pill.className = "info-view-skill-pill pill-button";
     pill.textContent = item;
     skillsPills.append(pill);
   });
@@ -337,77 +349,111 @@ window.addEventListener("keydown", (event) => {
   closeInfo();
 });
 
-initCategories({
-  onProjectOpen: (projectPayload) => {
-    // Save scroll position before opening project
-    if (galleryPanel) {
-      lastScrollPosition = galleryPanel.scrollTop;
-    }
-    projectPages.openProject(projectPayload);
+const handleProjectOpen = (projectPayload) => {
+  // Save scroll position before opening project
+  if (galleryPanel) {
+    lastScrollPosition = galleryPanel.scrollTop;
+  }
+  projectPages.openProject(projectPayload);
+  syncTrailState();
+};
+
+const handleProjectClose = () => {
+  const activeProjectCategoryId = projectPages.getCurrentProject?.()?.categoryId || null;
+  if (!galleryPanel) {
+    projectPages.closeProject();
     syncTrailState();
-  },
-  onProjectClose: () => {
-    const activeProjectCategoryId = projectPages.getCurrentProject?.()?.categoryId || null;
-    if (!galleryPanel) {
+    return;
+  }
+
+  const isMobileViewport = window.matchMedia("(max-width: 640px)").matches;
+  const originalScrollBehavior = galleryPanel.style.scrollBehavior;
+  galleryPanel.style.scrollBehavior = "auto";
+
+  // On mobile, pre-position to the section before closing the project view.
+  // This avoids a visible intermediate jump to another section.
+  if (isMobileViewport && activeProjectCategoryId) {
+    const sectionId = `gallery-${activeProjectCategoryId}`;
+    const sections = Array.from(galleryPanel.querySelectorAll(".gallery-section"));
+    const sectionIndex = sections.findIndex((section) => section.id === sectionId);
+    const panelHeight = galleryPanel.clientHeight;
+    const panelStyles = window.getComputedStyle(galleryPanel);
+    const sectionGap =
+      Number.parseFloat(panelStyles.rowGap || panelStyles.gap || "0") || 0;
+
+    if (sectionIndex >= 0 && panelHeight > 0) {
+      const mobileCategoryTarget = Math.round(sectionIndex * (panelHeight + sectionGap));
+      galleryPanel.scrollTop = mobileCategoryTarget;
       projectPages.closeProject();
+      galleryPanel.scrollTop = mobileCategoryTarget;
+      galleryPanel.dispatchEvent(new Event("scroll"));
+
+      requestAnimationFrame(() => {
+        galleryPanel.style.scrollBehavior = originalScrollBehavior;
+      });
       syncTrailState();
       return;
     }
+  }
 
-    const isMobileViewport = window.matchMedia("(max-width: 640px)").matches;
-    const originalScrollBehavior = galleryPanel.style.scrollBehavior;
-    galleryPanel.style.scrollBehavior = "auto";
+  projectPages.closeProject();
+  const targetSection =
+    isMobileViewport && activeProjectCategoryId
+      ? document.getElementById(`gallery-${activeProjectCategoryId}`)
+      : null;
+  const targetScrollTop =
+    targetSection instanceof HTMLElement ? targetSection.offsetTop : lastScrollPosition;
 
-    // On mobile, pre-position to the section before closing the project view.
-    // This avoids a visible intermediate jump to another section.
-    if (isMobileViewport && activeProjectCategoryId) {
-      const sectionId = `gallery-${activeProjectCategoryId}`;
-      const sections = Array.from(galleryPanel.querySelectorAll(".gallery-section"));
-      const sectionIndex = sections.findIndex((section) => section.id === sectionId);
-      const panelHeight = galleryPanel.clientHeight;
-      const panelStyles = window.getComputedStyle(galleryPanel);
-      const sectionGap =
-        Number.parseFloat(panelStyles.rowGap || panelStyles.gap || "0") || 0;
-
-      if (sectionIndex >= 0 && panelHeight > 0) {
-        const mobileCategoryTarget = Math.round(sectionIndex * (panelHeight + sectionGap));
-        galleryPanel.scrollTop = mobileCategoryTarget;
-        projectPages.closeProject();
-        galleryPanel.scrollTop = mobileCategoryTarget;
-        galleryPanel.dispatchEvent(new Event("scroll"));
-
-        requestAnimationFrame(() => {
-          galleryPanel.style.scrollBehavior = originalScrollBehavior;
-        });
-        syncTrailState();
-        return;
-      }
-    }
-
-    projectPages.closeProject();
-    const targetSection =
-      isMobileViewport && activeProjectCategoryId
-        ? document.getElementById(`gallery-${activeProjectCategoryId}`)
-        : null;
-    const targetScrollTop =
-      targetSection instanceof HTMLElement ? targetSection.offsetTop : lastScrollPosition;
-
-    // Desktop/fallback path: wait until category layout is visible, then restore.
+  // Desktop/fallback path: wait until category layout is visible, then restore.
+  requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        galleryPanel.scrollTop = targetScrollTop;
-        galleryPanel.dispatchEvent(new Event("scroll"));
+      galleryPanel.scrollTop = targetScrollTop;
+      galleryPanel.dispatchEvent(new Event("scroll"));
 
-        setTimeout(() => {
-          galleryPanel.style.scrollBehavior = originalScrollBehavior;
-        }, 50);
-      });
+      setTimeout(() => {
+        galleryPanel.style.scrollBehavior = originalScrollBehavior;
+      }, 50);
     });
+  });
 
-    syncTrailState();
-  },
+  syncTrailState();
+};
+
+initCategories({
+  onProjectOpen: handleProjectOpen,
+  onProjectClose: handleProjectClose,
   isProjectOpen: () => projectPages.isOpen(),
 });
+
+const syncProjectFromUrl = ({ cleanInvalid = false } = {}) => {
+  const routeProjectId = getProjectIdFromUrl();
+  const currentProjectId = projectPages.getCurrentProject?.()?.id || null;
+
+  if (routeProjectId && routeProjectId !== currentProjectId) {
+    suppressUrlSync = true;
+    const didOpen = openProjectById(routeProjectId);
+    suppressUrlSync = false;
+
+    if (!didOpen && cleanInvalid) {
+      suppressUrlSync = true;
+      updateProjectUrl(null, { replace: true });
+      suppressUrlSync = false;
+    }
+    return;
+  }
+
+  if (!routeProjectId && currentProjectId) {
+    suppressUrlSync = true;
+    handleProjectClose();
+    suppressUrlSync = false;
+  }
+};
+
+window.addEventListener("popstate", () => {
+  syncProjectFromUrl();
+});
+
+syncProjectFromUrl({ cleanInvalid: true });
 
 syncTrailState();
 

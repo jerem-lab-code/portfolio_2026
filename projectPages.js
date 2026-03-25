@@ -1,4 +1,5 @@
 import { projectCopyById } from "./project-content/index.js";
+import { buildProjectHref } from "./projectRouting.js";
 
 const threeDImageModules = import.meta.glob(
   "./project_utiliser/3d/**/*.{webp,jpg,jpeg,png,avif}",
@@ -1289,7 +1290,7 @@ function createProjectLoadingState(projectLabel) {
   return loading;
 }
 
-export function initProjectPages({ galleryPanel }) {
+export function initProjectPages({ galleryPanel, onProjectOpen, onProjectClose } = {}) {
   if (!galleryPanel) {
     return {
       closeProject() { },
@@ -1299,6 +1300,8 @@ export function initProjectPages({ galleryPanel }) {
     };
   }
 
+  const handleProjectOpen = typeof onProjectOpen === "function" ? onProjectOpen : null;
+  const handleProjectClose = typeof onProjectClose === "function" ? onProjectClose : null;
   const pageBody = document.body;
   const projectViewRoot = createProjectViewRoot();
   galleryPanel.append(projectViewRoot);
@@ -1516,13 +1519,15 @@ export function initProjectPages({ galleryPanel }) {
     otherGrid.className = "project-other-grid";
 
     otherProjects.forEach((otherProject) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "project-other-card";
+      const link = document.createElement("a");
+      link.className = "project-other-card";
+      link.href = buildProjectHref(otherProject.id);
+      link.setAttribute("aria-label", `Ouvrir le projet ${otherProject.label}`);
       if (isPngSource(otherProject.mainImageSrc)) {
-        button.classList.add("is-png");
+        link.classList.add("is-png");
       }
-      button.addEventListener("click", () => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
         openProject({ ...otherProject, allProjects: project.allProjects });
       });
 
@@ -1537,8 +1542,8 @@ export function initProjectPages({ galleryPanel }) {
       label.className = "project-other-label";
       label.textContent = otherProject.label;
 
-      button.append(image, label);
-      otherGrid.append(button);
+      link.append(image, label);
+      otherGrid.append(link);
     });
 
     otherFooter.append(otherTitle, otherGrid);
@@ -1571,6 +1576,9 @@ export function initProjectPages({ galleryPanel }) {
     const renderRequestId = ++activeRenderRequestId;
 
     currentProject = projectPayload;
+    if (handleProjectOpen) {
+      handleProjectOpen(projectPayload);
+    }
     pageBody.classList.add("is-project-view");
     projectViewRoot.setAttribute("aria-hidden", "false");
     projectViewRoot.replaceChildren(createProjectLoadingState(projectPayload.label));
@@ -1586,7 +1594,11 @@ export function initProjectPages({ galleryPanel }) {
     activeRenderRequestId += 1;
     runProjectCleanup();
     if (!currentProject) return;
+    const previousProject = currentProject;
     currentProject = null;
+    if (handleProjectClose) {
+      handleProjectClose(previousProject);
+    }
     pageBody.classList.remove("is-project-view");
     projectViewRoot.setAttribute("aria-hidden", "true");
     projectViewRoot.replaceChildren();

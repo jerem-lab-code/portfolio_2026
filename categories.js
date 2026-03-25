@@ -11,6 +11,7 @@ import chefCocoMainImage from "./project_utiliser/visual identity/Chef Coco/chef
 import beurreMainImage from "./project_utiliser/creative-coding/Beurre/beurre_thumbnail.webp";
 import ecosystemMainImage from "./project_utiliser/creative-coding/Ecosystem/img.webp";
 import mariageStoryMainImage from "./project_utiliser/creative-coding/Mariage story/test_4.webp";
+import { buildProjectHref } from "./projectRouting.js";
 
 const pageBody = document.body;
 const projectsButton = document.getElementById("projects-button");
@@ -137,7 +138,7 @@ const featuredProjectsByCategory = {
 const categoryLabelById = Object.fromEntries(
   categories.map((category) => [category.id, category.label])
 );
-const detailProjects = Object.entries(featuredProjectsByCategory).flatMap(
+export const detailProjects = Object.entries(featuredProjectsByCategory).flatMap(
   ([categoryId, projects]) =>
     projects
       .filter((project) => project.id && project.projectPath)
@@ -216,6 +217,36 @@ let lastViewportWidth = window.innerWidth;
 let lastViewportHeight = window.innerHeight;
 let lastPanelWidth = galleryPanel?.clientWidth || 0;
 let lastPanelHeight = galleryPanel?.clientHeight || 0;
+
+function getLandingArrow() {
+  return window.matchMedia("(max-width: 640px)").matches ? "↓" : "↑";
+}
+
+function setProjectsButtonToLanding() {
+  projectsButton.textContent = getLandingArrow();
+  projectsButton.setAttribute("aria-label", "Retour à l’accueil");
+}
+
+export function openProjectById(projectId) {
+  if (!projectId) return false;
+  const project = detailProjects.find((entry) => entry.id === projectId);
+  if (!project) return false;
+
+  if (!isCategoriesView) {
+    enterCategoriesView();
+  }
+
+  openProjectDetail(
+    {
+      id: project.id,
+      projectLabel: project.label,
+      src: project.mainImageSrc,
+      projectPath: project.projectPath,
+    },
+    project.categoryId
+  );
+  return true;
+}
 
 function isPngSource(source) {
   if (typeof source !== "string") return false;
@@ -1171,16 +1202,22 @@ function renderCategorySections() {
         );
         if (canOpenProjectDetail) {
           card.classList.add("is-clickable");
-          card.tabIndex = 0;
-          card.setAttribute("role", "button");
+          const link = document.createElement("a");
+          link.className = "project-card-link";
+          link.href = buildProjectHref(featuredProject.id);
+          link.setAttribute("aria-label", `Ouvrir le projet ${featuredProject.projectLabel}`);
 
-          const handleOpen = () => openProjectDetail(featuredProject, category.id);
-          card.addEventListener("click", handleOpen);
-          card.addEventListener("keydown", (event) => {
-            if (event.key !== "Enter" && event.key !== " ") return;
+          const label = document.createElement("span");
+          label.className = "sr-only";
+          label.textContent = `Ouvrir le projet ${featuredProject.projectLabel}`;
+          link.append(label);
+
+          link.addEventListener("click", (event) => {
             event.preventDefault();
-            handleOpen();
+            openProjectDetail(featuredProject, category.id);
           });
+
+          card.append(link);
         }
 
         grid.append(card);
@@ -1204,8 +1241,7 @@ function enterCategoriesView() {
   isCategoriesView = true;
   pageBody.classList.add("is-categories");
   syncActionsPlacement();
-  projectsButton.textContent = "↓";
-  projectsButton.setAttribute("aria-label", "Retour à l’accueil");
+  setProjectsButtonToLanding();
   requestAnimationFrame(() => {
     scheduleSectionSizing();
     scrollToCategory(categories[0].id, "auto");
@@ -1232,8 +1268,7 @@ function exitCategoriesView() {
 function handleProjectsButton() {
   if (isProjectOpen()) {
     if (typeof onProjectClose === "function") onProjectClose();
-    projectsButton.textContent = "↓";
-    projectsButton.setAttribute("aria-label", "Retour à l’accueil");
+    setProjectsButtonToLanding();
     syncActionsPlacement();
     return;
   }
@@ -1281,5 +1316,8 @@ export function initCategories(options = {}) {
     updateCategoryPillMetrics();
     syncActionsPlacement();
     scheduleSectionSizing();
+    if (isCategoriesView && !isProjectOpen()) {
+      setProjectsButtonToLanding();
+    }
   });
 }
