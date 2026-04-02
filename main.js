@@ -190,8 +190,17 @@ function createInfoView() {
     event.stopPropagation();
   });
 
+  const linkedInLink = document.createElement("a");
+  linkedInLink.className = "pill-button info-view-link";
+  linkedInLink.href = "https://www.linkedin.com/in/jeremiekursner/";
+  linkedInLink.target = "_blank";
+  linkedInLink.rel = "noreferrer noopener";
+  linkedInLink.textContent = "LinkedIn";
+  linkedInLink.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
 
-  links.append(instagramLink, mailLink, backButton);
+  links.append(instagramLink, linkedInLink, mailLink, backButton);
   content.addEventListener("click", (event) => {
     event.stopPropagation();
   });
