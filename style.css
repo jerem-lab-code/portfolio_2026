@@ -6,9 +6,9 @@
 }
 
 @font-face {
-  font-family: "Delta Mono Web";
-  src: url("Fonts/Delta_Mono-Regular.otf") format("opentype");
-  font-weight: 400;
+  font-family: "DM Mono Medium";
+  src: url("Fonts/DMMono-Medium.ttf") format("truetype");
+  font-weight: 500;
   font-style: normal;
 }
 
@@ -45,7 +45,7 @@
   --project-name-pill-bg: color-mix(in oklab, #f6f4ef 72%, transparent);
   --project-name-pill-text: #000000;
   --dictact-font: "Didact Gothic", "La Dict Act Regular", "Helvetica Neue", Arial, sans-serif;
-  --title-font: "Delta Mono Web", "Delta_Mono", "Delta Mono", "JetBrains Mono",
+  --title-font: "DM Mono Medium", "Delta_Mono", "Delta Mono", "JetBrains Mono",
     "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, Consolas,
     "Liberation Mono", monospace;
 }
@@ -377,7 +377,7 @@ body.is-categories .top-header {
   column-gap: var(--name-gap);
   transform: translateY(-14px);
   font-family: var(--title-font);
-  font-weight: 600;
+  font-weight: 400;
   font-size: clamp(1.85rem,
       calc((60vw - var(--page-gutter) - var(--name-gap)) / var(--name-word-units)),
       12rem);
