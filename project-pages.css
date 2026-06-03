@@ -102,7 +102,7 @@ body.is-project-view .actions .pill-button:last-child {
 .project-title {
   margin: 0;
   font-family: var(--title-font);
-  font-weight: 400;
+  font-weight: 600;
   font-size: clamp(1.8rem, 4.8vw, 3.8rem);
   line-height: 1.02;
   letter-spacing: -0.02em;
@@ -112,7 +112,7 @@ body.is-project-view .actions .pill-button:last-child {
 .project-description {
   margin: 0;
   max-width: 90ch;
-  font-family: var(--suisse-font);
+  font-family: var(--dictact-font);
   font-size: clamp(0.92rem, 1.15vw, 1.06rem);
   line-height: 1.55;
   color: color-mix(in oklab, var(--heading-text) 90%, transparent);
@@ -130,7 +130,7 @@ body.is-project-view .actions .pill-button:last-child {
 
 .project-collaboration {
   margin: 0;
-  font-family: var(--suisse-font);
+  font-family: var(--dictact-font);
   font-size: clamp(0.72rem, 0.95vw, 0.82rem);
   letter-spacing: 0.01em;
   color: color-mix(in oklab, var(--heading-text) 70%, transparent);
@@ -151,7 +151,7 @@ body.is-project-view .actions .pill-button:last-child {
   border: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
   border-radius: 999px;
   padding: 0.32rem 0.85rem;
-  font-family: var(--suisse-font);
+  font-family: var(--dictact-font);
   font-size: 0.74rem;
   text-decoration: none;
   color: var(--heading-text);
@@ -310,7 +310,7 @@ body.is-project-view .actions .pill-button:last-child {
   padding: 12px 24px;
   background: #000;
   color: #fff;
-  font-family: var(--suisse-font);
+  font-family: var(--dictact-font);
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
@@ -344,7 +344,7 @@ body.is-project-view .actions .pill-button:last-child {
   z-index: 10;
   padding: 10px 20px;
   border-radius: 999px;
-  font-family: var(--suisse-font);
+  font-family: var(--dictact-font);
   font-size: 14px;
   color: #000;
   background: rgba(255, 255, 255, 0.9);
@@ -506,7 +506,7 @@ img.iland-logo {
   min-width: clamp(38px, 3.6vw, 44px);
   min-height: clamp(32px, 3.2vw, 38px);
   padding: 0;
-  font-family: var(--suisse-font);
+  font-family: var(--dictact-font);
   color: var(--heading-text);
   background: color-mix(in oklab, var(--surface) 45%, transparent);
   backdrop-filter: blur(14px);
