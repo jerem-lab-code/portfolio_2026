@@ -12,6 +12,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Suisse Intl";
+  src: url("Fonts/SuisseIntl-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
 :root {
   --page-gutter: clamp(16px, 4vw, 40px);
   --name-size: clamp(2rem, 14vw, 17rem);
@@ -44,7 +51,7 @@
   --toggle-icon: #ffffff;
   --project-name-pill-bg: color-mix(in oklab, #f6f4ef 72%, transparent);
   --project-name-pill-text: #000000;
-  --dictact-font: "Didact Gothic", "La Dict Act Regular", "Helvetica Neue", Arial, sans-serif;
+  --dictact-font: "Suisse Intl", "Didact Gothic", "Helvetica Neue", Arial, sans-serif;
   --title-font: "DM Mono Medium", "Delta_Mono", "Delta Mono", "JetBrains Mono",
     "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, Consolas,
     "Liberation Mono", monospace;
