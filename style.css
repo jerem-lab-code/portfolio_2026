@@ -557,16 +557,60 @@ body.is-categories .actions {
   display: grid;
   grid-template-columns: var(--category-pill-width) 1fr auto;
   align-items: start;
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+}
+
+body.is-categories .actions .pill-button {
+  pointer-events: auto;
 }
 
 body.is-categories .projects-button {
-  justify-self: center;
+  justify-self: start;
   min-width: 0;
   padding-inline: 1rem;
 }
 
 body.is-categories .info-button {
+  grid-column: 3;
+  grid-row: 1;
   justify-self: end;
+  margin-left: 0;
+}
+
+@media (min-width: 641px) {
+  /* In the projects area, let the category filters sit above the full gallery. */
+  body.is-categories .categories-layout {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  body.is-categories .categories-sidebar {
+    position: absolute;
+    top: calc(-1 * (var(--pill-height) + 12px) - 8px);
+    left: 0;
+    right: 0;
+    z-index: 2;
+    width: 100%;
+  }
+
+  body.is-categories .category-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    padding-left: clamp(96px, 9vw, 140px);
+  }
+
+  body.is-categories .category-button {
+    width: fit-content;
+    min-width: 0;
+    flex: 0 0 auto;
+  }
 }
 
 .categories-layout {
@@ -617,7 +661,7 @@ body.is-categories .categories-layout {
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 320ms ease, transform 320ms ease,
-    background-color 240ms ease, color 240ms ease;
+    background-color 240ms ease, color 240ms ease, border-color 220ms ease;
 }
 
 .category-button::before {
@@ -659,8 +703,13 @@ body.is-categories .category-button:nth-child(5) {
 }
 
 .category-button.is-active {
-  background: var(--capsule-bg);
-  color: var(--capsule-text);
+  background: #ffffff;
+  color: #000000;
+}
+
+.category-button:hover,
+.category-button:focus-visible {
+  border-color: #ffffff;
 }
 
 .gallery-panel {
@@ -1334,12 +1383,8 @@ body.is-categories .category-button:nth-child(5) {
     opacity: 1;
   }
 
-  .category-button:not(.is-active):hover::before {
+  .category-button:hover::before {
     opacity: 1;
-  }
-
-  .category-button.is-active:hover::before {
-    opacity: 0;
   }
 }
 
