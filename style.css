@@ -1,11 +1,4 @@
 @font-face {
-  font-family: "Didact Gothic";
-  src: url("Fonts/DidactGothic-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
   font-family: "DM Mono Medium";
   src: url("Fonts/DMMono-Medium.ttf") format("truetype");
   font-weight: 500;
@@ -51,7 +44,7 @@
   --toggle-icon: #ffffff;
   --project-name-pill-bg: color-mix(in oklab, #f6f4ef 72%, transparent);
   --project-name-pill-text: #000000;
-  --dictact-font: "Suisse Intl", "Didact Gothic", "Helvetica Neue", Arial, sans-serif;
+  --dictact-font: "Suisse Intl", "Helvetica Neue", Arial, sans-serif;
   --title-font: "DM Mono Medium", "Delta_Mono", "Delta Mono", "JetBrains Mono",
     "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, Consolas,
     "Liberation Mono", monospace;
